@@ -9,6 +9,7 @@ Plug 'https://github.com/numirias/semshi'
 Plug 'https://github.com/junegunn/fzf'
 Plug 'vim-scripts/grep.vim'
 Plug 'https://github.com/vimwiki/vimwiki'
+Plug 'dense-analysis/ale'
 call plug#end()
 
 set number
@@ -35,9 +36,10 @@ nnoremap <C-F> :FZF<CR>
 
 
 "let g:loaded_youcompleteme = 1
+let g:badwolf_colorterm = 0
 color badwolf 
 set hlsearch
 set incsearch
 "use system clipboard so copy and paste just works
-"set clipboard=unnamedplus
+"set clipboard=unnamed
 set mouse=a
