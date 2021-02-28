@@ -1,5 +1,6 @@
 mkdir -p ~/.vim/ftplugin/
 cp python.vim ~/.vim/ftplugin/
+mkdir -p  ~/.config/nvim/
 cp init.vim ~/.config/nvim/init.vim
 cp .vimrc ~/
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
