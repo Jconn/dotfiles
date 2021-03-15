@@ -43,3 +43,4 @@ set incsearch
 "use system clipboard so copy and paste just works
 "set clipboard=unnamed
 set mouse=a
+set encoding=utf8
