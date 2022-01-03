@@ -1,17 +1,3 @@
-call plug#begin('~/.vim/plugin-jwc')
-Plug 'rust-lang/rust.vim'
-Plug 'Valloric/YouCompleteMe'
-Plug 'scrooloose/NERDtree', {'on': 'NERDTreeToggle' }
-Plug 'https://github.com/tmhedberg/SimpylFold'
-Plug 'https://github.com/Konfekt/FastFold'
-Plug 'https://github.com/nvie/vim-flake8'
-Plug 'https://github.com/numirias/semshi'
-Plug 'https://github.com/junegunn/fzf'
-Plug 'vim-scripts/grep.vim'
-Plug 'https://github.com/vimwiki/vimwiki'
-Plug 'dense-analysis/ale'
-call plug#end()
-
 set number
 set showcmd
 filetype on
