@@ -1,5 +1,5 @@
-set runtimepath^=~/.vim runtimepath+=~/.vim/after
-let &packpath = &runtimepath
+" set runtimepath^=~/.vim runtimepath+=~/.vim/after
+" let &packpath = &runtimepath
 
 "source ~/.vimrc
 tnoremap <Esc> <C-\><C-n>
@@ -17,9 +17,13 @@ Plug 'nvim-lua/lsp-status.nvim'
 Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'hrsh7th/cmp-buffer'
 Plug 'hrsh7th/nvim-cmp'
+" signature help
+Plug 'ray-x/lsp_signature.nvim'
+
 Plug 'wbthomason/packer.nvim' 
 Plug 'L3MON4D3/LuaSnip'
 " telescope
+Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
 Plug 'nvim-telescope/telescope-fzy-native.nvim'
@@ -33,13 +37,12 @@ Plug 'kyazdani42/nvim-web-devicons' " Recommended (for coloured icons)
 Plug 'akinsho/nvim-bufferline.lua'
 Plug 'rust-lang/rust.vim'
 Plug 'scrooloose/NERDtree', {'on': 'NERDTreeToggle' }
-Plug 'https://github.com/tmhedberg/SimpylFold'
-Plug 'https://github.com/Konfekt/FastFold'
 Plug 'https://github.com/nvie/vim-flake8'
 " Plug 'https://github.com/numirias/semshi'
 Plug 'https://github.com/junegunn/fzf'
 Plug 'vim-scripts/grep.vim'
 Plug 'https://github.com/vimwiki/vimwiki'
+Plug 'https://github.com/tpope/vim-dispatch'
 call plug#end()
 """""""""""""""""
 " generic section
@@ -122,8 +125,11 @@ nnoremap <leader>t :term<CR>
 
 " switch between buffers
 set hidden
-nnoremap <C-N> :bnext<CR>
+nnoremap <Tab> :bnext<CR>
+nnoremap <S-Tab> :bprev<CR>
 nnoremap <C-P> :bprev<CR>
+nnoremap <leader>c :bd<CR>
+
 
 " folding
 "set foldmethod=syntax
@@ -159,7 +165,6 @@ local on_attach = function(client, bufnr)
   buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
 
   -- Mappings.
-  -- buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
   local opts = { noremap=true, silent=true }
   buf_set_keymap('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
   buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
@@ -205,28 +210,47 @@ local on_attach = function(client, bufnr)
   lsp_status.on_attach(client)
 end
 
+local cmp = require("cmp")
+cmp.setup {
+  sources = {
+    { name = 'nvim_lsp' }
+  },
+  mapping = {
+          ["<C-u>"] = cmp.mapping.scroll_docs(-4),
+          ["<C-d>"] = cmp.mapping.scroll_docs(4),
+          ["<C-Space>"] = cmp.mapping.complete(),
+  },
+}
+
+-- The nvim-cmp almost supports LSP's capabilities so You should advertise it to LSP servers..
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
+capabilities.textDocument.completion.completionItem.snippetSupport = true
+
 require'lspconfig'.rust_analyzer.setup(
 {
     cmd = {"rust-analyzer"},
-    on_attach=on_attach
+    on_attach=on_attach,
+    capabilities = capabilities,
 }
 )
 
 require'lspconfig'.pylsp.setup(
 {
+    capabilities = capabilities,
     cmd = {"pylsp"},
     settings = {
     pylsp = {
     plugins = {
-      pycodestyle = {enabled = false},
+      pycodestyle = {enabled = true},
       flake8 = {
-        enabled = true,
+        enabled = false,
         ignore = {},
         maxLineLength = 160
       },
-      pylsp_mypy =  {enabled = true, live_mode = true, dmypy=false, strict=true},
+      pylsp_mypy =  {enabled = true, live_mode = true, dmypy=false, strict=false},
       pylsp_isort = {enabled = true},
-      yapf = {enabled = false},
+      yapf = {enabled = true},
       pylint = {enabled = false}
     }
 }
@@ -239,6 +263,7 @@ require'lspconfig'.pylsp.setup(
 require'lspconfig'.clangd.setup(
 { 
     cmd = {"clangd-11"},
+    capabilities = capabilities,
     on_attach=on_attach,
     filetypes = { "c", "cpp", "objc", "objcpp" },
     root_dir = util.root_pattern("build")
@@ -247,11 +272,20 @@ require'lspconfig'.clangd.setup(
 require'lspconfig'.dockerls.setup(
 {
     cmd = { "docker-langserver", "--stdio" },
+    capabilities = capabilities,
     on_attach=on_attach,
     filetypes = { "Dockerfile"},
     root_dir = util.root_pattern(".git")
 });
+local signature_config = {
+  log_path = vim.fn.expand("$HOME") .. "/tmp/sig.log",
+  debug = true,
+  hint_enable = false,
+  handler_opts = { border = "single" },
+  max_width = 80,
+}
 
+require("lsp_signature").setup(signature_config)
 EOF
 "
 "require'navigator'.setup(
